@@ -1,4 +1,4 @@
-package org.learning.hotau.unit;
+package org.learning.hotau.unittesting.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class ClientServiceImplTest {
     private static final String MOCK_NATIONALID_CODE_1 = "1234567";
     private static final LocalDate MOCK_BIRTHDAY_1 = LocalDate.of(1980, 2, 2);
     private static final LocalDateTime MOCK_CLIENT_SINCE_1 = LocalDateTime.now();
-    private static final long MOCK_ID_1 = 1L;
+    private static final Long MOCK_ID_1 = 1L;
     @Autowired
     private ClientService clientService;
 
