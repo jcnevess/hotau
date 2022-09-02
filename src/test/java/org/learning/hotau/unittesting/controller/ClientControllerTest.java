@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.learning.hotau.dto.form.ClientForm;
 import org.learning.hotau.model.Address;
 import org.learning.hotau.model.Client;
+import org.learning.hotau.model.Pet;
 import org.learning.hotau.service.impl.ClientServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -103,7 +105,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void testCreateValidClient() throws Exception {
+    void shouldCreateValidClient() throws Exception {
         //Setup mock
         when(clientService.save(any(ClientForm.class))).thenReturn(mockClient1);
 
@@ -117,4 +119,30 @@ public class ClientControllerTest {
                 .andExpect(header().string("Location", "/client/1"))
                 .andExpect(jsonPath("$.id").value(MOCK_ID_1));
     }
+
+    @Test
+    void SearchByIdShouldReturnCorrectClient_WhenItExists() throws Exception{
+        when(clientService.findById(eq(MOCK_ID_1))).thenReturn(mockClient1);
+
+        mockMvc.perform(get("/client/" + MOCK_ID_1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(MOCK_ID_1))
+                .andExpect(jsonPath("$.email").value(MOCK_EMAIL_1))
+                .andExpect(jsonPath("$.fullName").value(MOCK_FULL_NAME_1))
+                .andExpect(jsonPath("$.address.street").value(MOCK_ADDRESS_STREET_1))
+                .andExpect(jsonPath("$.address.streetNumber").value(MOCK_STREET_NUMBER_1))
+                .andExpect(jsonPath("$.address.neighborhood").value(MOCK_NEIGHBORHOOD_1))
+                .andExpect(jsonPath("$.address.zipcode").value(MOCK_ZIPCODE_1))
+                .andExpect(jsonPath("$.address.city").value(MOCK_CITY_1))
+                .andExpect(jsonPath("$.address.state").value(MOCK_STATE_1))
+                .andExpect(jsonPath("$.address.country").value(MOCK_COUNTRY_1))
+                .andExpect(jsonPath("$.mainPhoneNumber").value(MOCK_MAIN_PHONE_NUMBER_1))
+                .andExpect(jsonPath("$.secondaryPhoneNumber").value(MOCK_SEC_PHONE_NUMBER_1))
+                .andExpect(jsonPath("$.cpfCode").value(MOCK_CPF_CODE_1))
+                .andExpect(jsonPath("$.nationalIdCode").value(MOCK_NATIONALID_CODE_1))
+                .andExpect(jsonPath("$.birthday").value(MOCK_BIRTHDAY_1.toString()))
+                .andExpect(jsonPath("$.clientSince").value(MOCK_CLIENT_SINCE_1.toString()));
+    }
+
 }

@@ -14,9 +14,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -96,7 +99,7 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void testSaveSucessful() {
+    void ShouldSaveSucessfully() {
         // Setup our mock repository
         when(clientRepository.save(any(Client.class))).thenReturn(mockClient1);
 
@@ -130,7 +133,21 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void testFindById(){
+    void SearchByIdShouldReturnCorrectClient_WhenItExists(){
+        when(clientRepository.findById(eq(MOCK_ID_1)))
+                .thenReturn(Optional.of(mockClient1));
 
+        Client returnedClient = clientService.findById(MOCK_ID_1);
+
+        assertEquals(mockClient1, returnedClient);
+    }
+
+    @Test
+    void SearchByIdShouldReturnNotFound_WhenClientDoesNotExist() {
+        long invalidId = -1;
+        when(clientRepository.findById(invalidId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> clientService.findById(invalidId));
     }
 }
