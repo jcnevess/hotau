@@ -1,6 +1,6 @@
 package org.learning.hotau.service.impl;
 
-import org.learning.hotau.dto.ClientForm;
+import org.learning.hotau.dto.form.ClientForm;
 import org.learning.hotau.model.Address;
 import org.learning.hotau.model.Client;
 import org.learning.hotau.repository.ClientRepository;
@@ -17,7 +17,7 @@ public class ClientServiceImpl implements ClientService {
     private ClientRepository clientRepository;
 
     @Override
-    public Client create(ClientForm form) {
+    public Client save(ClientForm form) {
         Client client = new Client();
         client.setEmail(form.getEmail());
         client.setFullName(form.getFullName());
@@ -42,12 +42,12 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client get(Long id) {
+    public Client findById(Long id) {
         return clientRepository.findById(id).orElseThrow();
     }
 
     @Override
-    public List<Client> getAll() {
+    public List<Client> findAll() {
         return clientRepository.findAll();
     }
 

@@ -1,4 +1,4 @@
-package org.learning.hotau.dto;
+package org.learning.hotau.dto.form;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package org.learning.hotau.controller;
 
-import org.learning.hotau.dto.ClientForm;
+import org.learning.hotau.dto.form.ClientForm;
 import org.learning.hotau.model.Client;
 import org.learning.hotau.service.impl.ClientServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +19,16 @@ public class ClientController {
 
     @PostMapping
     public ResponseEntity<Client> create(@Valid @RequestBody ClientForm form) {
-        return new ResponseEntity<>(clientService.create(form), HttpStatus.CREATED);
+        return new ResponseEntity<>(clientService.save(form), HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<Iterable<Client>> getAll() {
-        return ResponseEntity.ok(clientService.getAll());
+        return ResponseEntity.ok(clientService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Client> get(@PathVariable Long id) {
-        return ResponseEntity.ok(clientService.get(id));
+        return ResponseEntity.ok(clientService.findById(id));
     }
 }
