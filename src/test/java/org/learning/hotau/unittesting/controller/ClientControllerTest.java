@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ClientControllerTest {
 
-    private static final String REQUEST_ROOT_URL = "/client";
+    private static final String REQUEST_ROOT_URL = "/clients";
     private static final String MOCK_EMAIL_1 = "jose@dasilva.com";
     private static final String MOCK_FULL_NAME_1 = "José da Silva";
     private static final String MOCK_ADDRESS_STREET_1 = "Sunflower St.";

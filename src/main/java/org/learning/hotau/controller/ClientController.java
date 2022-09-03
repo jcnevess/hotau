@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 
-// TODO Make urls compliant with the best practices of naming
 @RestController
-@RequestMapping("/client")
+@RequestMapping("/clients")
 public class ClientController {
 
     @Autowired
@@ -23,7 +22,7 @@ public class ClientController {
     public ResponseEntity<Client> create(@Valid @RequestBody ClientForm form) {
         Client newClient = clientService.save(form);
 
-        return ResponseEntity.created(URI.create("/client/" + newClient.getId()))
+        return ResponseEntity.created(URI.create("/clients/" + newClient.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(newClient);
     }
