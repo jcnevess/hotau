@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.learning.hotau.dto.form.ClientForm;
 import org.learning.hotau.model.Address;
 import org.learning.hotau.model.Client;
-import org.learning.hotau.model.Pet;
 import org.learning.hotau.service.impl.ClientServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,6 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ClientControllerTest {
+
+    private static final String REQUEST_ROOT_URL = "/client";
     private static final String MOCK_EMAIL_1 = "jose@dasilva.com";
     private static final String MOCK_FULL_NAME_1 = "José da Silva";
     private static final String MOCK_ADDRESS_STREET_1 = "Sunflower St.";
@@ -107,24 +112,26 @@ public class ClientControllerTest {
     @Test
     void shouldCreateValidClient() throws Exception {
         //Setup mock
-        when(clientService.save(any(ClientForm.class))).thenReturn(mockClient1);
+        when(clientService.save(any(ClientForm.class)))
+                .thenReturn(mockClient1);
 
         // Call
-        mockMvc.perform(post("/client")
+        mockMvc.perform(post(REQUEST_ROOT_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(mockClientForm1)))
                 //Check
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(header().string("Location", "/client/1"))
+                .andExpect(header().string("Location", REQUEST_ROOT_URL + "/" + MOCK_ID_1))
                 .andExpect(jsonPath("$.id").value(MOCK_ID_1));
     }
 
     @Test
-    void SearchByIdShouldReturnCorrectClient_WhenItExists() throws Exception{
-        when(clientService.findById(eq(MOCK_ID_1))).thenReturn(mockClient1);
+    void searchByIdShouldReturnCorrectClient_WhenItExists() throws Exception{
+        when(clientService.findById(eq(MOCK_ID_1)))
+                .thenReturn(mockClient1);
 
-        mockMvc.perform(get("/client/" + MOCK_ID_1))
+        mockMvc.perform(get(REQUEST_ROOT_URL+ "/" + MOCK_ID_1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(MOCK_ID_1))
@@ -141,8 +148,43 @@ public class ClientControllerTest {
                 .andExpect(jsonPath("$.secondaryPhoneNumber").value(MOCK_SEC_PHONE_NUMBER_1))
                 .andExpect(jsonPath("$.cpfCode").value(MOCK_CPF_CODE_1))
                 .andExpect(jsonPath("$.nationalIdCode").value(MOCK_NATIONALID_CODE_1))
-                .andExpect(jsonPath("$.birthday").value(MOCK_BIRTHDAY_1.toString()))
-                .andExpect(jsonPath("$.clientSince").value(MOCK_CLIENT_SINCE_1.toString()));
+                .andExpect(jsonPath("$.birthday").value(MOCK_BIRTHDAY_1.toString()));
+    }
+
+    @Test
+    void searchByIdShouldReturnNotFound_WhenClientDoesNotExist() throws Exception {
+        long invalidId = -1;
+
+        when(clientService.findById(eq(invalidId)))
+                .thenThrow(NoSuchElementException.class);
+
+        mockMvc.perform(get(REQUEST_ROOT_URL + "/" + invalidId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getAllShouldReturnEmptyList_WhenThereIsNoClients() throws Exception {
+        when(clientService.findAll())
+                .thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get(REQUEST_ROOT_URL))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void getAllShouldReturnListWithElement_WhenThereIsClient() throws Exception {
+        List<Client> mockClientList = Collections.singletonList(mockClient1);
+
+        when(clientService.findAll())
+                .thenReturn(mockClientList);
+
+        mockMvc.perform(get(REQUEST_ROOT_URL))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$[0].id").value(MOCK_ID_1));
     }
 
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 
+// TODO Make urls compliant with the best practices of naming
 @RestController
 @RequestMapping("/client")
 public class ClientController {

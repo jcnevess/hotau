@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data @NoArgsConstructor @AllArgsConstructor
@@ -40,6 +40,6 @@ public class Client {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "client_id")
-    private List<Pet> pets = new LinkedList<>();
+    private List<Pet> pets = new ArrayList<>();
 
 }

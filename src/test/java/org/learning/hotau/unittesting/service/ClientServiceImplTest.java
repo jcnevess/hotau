@@ -14,8 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -99,7 +98,7 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void ShouldSaveSucessfully() {
+    void shouldSaveSucessfully() {
         // Setup our mock repository
         when(clientRepository.save(any(Client.class))).thenReturn(mockClient1);
 
@@ -133,7 +132,7 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void SearchByIdShouldReturnCorrectClient_WhenItExists(){
+    void searchByIdShouldReturnCorrectClient_WhenItExists(){
         when(clientRepository.findById(eq(MOCK_ID_1)))
                 .thenReturn(Optional.of(mockClient1));
 
@@ -143,11 +142,34 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void SearchByIdShouldReturnNotFound_WhenClientDoesNotExist() {
+    void searchByIdShouldReturnNotFound_WhenClientDoesNotExist() {
         long invalidId = -1;
         when(clientRepository.findById(invalidId))
                 .thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> clientService.findById(invalidId));
+    }
+
+    @Test
+    void getAllShouldReturnEmptyList_WhenThereIsNoClients() {
+        when(clientRepository.findAll())
+                .thenReturn(new ArrayList<>());
+
+        List<Client> returnedClients = clientService.findAll();
+
+        assertNotNull(returnedClients);
+        assertTrue(returnedClients.isEmpty());
+    }
+
+    @Test
+    void getAllShouldReturnListWithElement_WhenThereIsClient() {
+        List<Client> mockClientList = Collections.singletonList(mockClient1);
+
+        when(clientRepository.findAll())
+                .thenReturn(mockClientList);
+
+        List<Client> returnedClients = clientService.findAll();
+
+        assertEquals(mockClientList, returnedClients);
     }
 }
