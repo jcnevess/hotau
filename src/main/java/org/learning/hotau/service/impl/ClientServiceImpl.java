@@ -53,7 +53,29 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client update(ClientForm form) {
-        return null;
+        return clientRepository.findById(form.getId())
+                .map(client -> {
+                    client.setEmail(form.getEmail());
+                    client.setFullName(form.getFullName());
+
+                    Address address = client.getAddress();
+                    address.setStreet(form.getAddressStreet());
+                    address.setStreetNumber(form.getAddressStreetNumber());
+                    address.setNeighborhood(form.getAddressNeighborhood());
+                    address.setZipcode(form.getAddressZipcode());
+                    address.setCity(form.getAddressCity());
+                    address.setState(form.getAddressState());
+                    address.setCountry(form.getAddressCountry());
+
+                    client.setMainPhoneNumber(form.getMainPhoneNumber());
+                    client.setSecondaryPhoneNumber(form.getSecondaryPhoneNumber());
+                    client.setCpfCode(form.getCpfCode());
+                    client.setNationalIdCode(form.getNationalIdCode());
+                    client.setBirthday(form.getBirthday());
+
+                    return clientRepository.save(client);
+                })
+                .orElseThrow();
     }
 
     @Override

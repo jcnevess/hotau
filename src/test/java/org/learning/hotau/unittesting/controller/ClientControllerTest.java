@@ -187,4 +187,9 @@ public class ClientControllerTest {
                 .andExpect(jsonPath("$[0].id").value(MOCK_ID_1));
     }
 
+    @Test
+    void shouldUpdateClient_WhenItExists() {
+
+    }
+
 }

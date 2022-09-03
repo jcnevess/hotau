@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data @NoArgsConstructor @AllArgsConstructor
+@Builder(toBuilder = true)
 @Entity @Table(name = "clients")
 public class Client {
 

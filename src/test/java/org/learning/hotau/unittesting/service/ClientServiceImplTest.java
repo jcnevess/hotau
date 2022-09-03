@@ -17,8 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -57,6 +56,7 @@ public class ClientServiceImplTest {
 
     private void setUpMockClientForm() {
         mockClientForm1 = new ClientForm();
+        mockClientForm1.setId(MOCK_ID_1);
         mockClientForm1.setEmail(MOCK_EMAIL_1);
         mockClientForm1.setFullName(MOCK_FULL_NAME_1);
         mockClientForm1.setAddressStreet(MOCK_ADDRESS_STREET_1);
@@ -142,7 +142,7 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void searchByIdShouldReturnNotFound_WhenClientDoesNotExist() {
+    void searchByIdShouldThrowException_WhenClientDoesNotExist() {
         long invalidId = -1;
         when(clientRepository.findById(invalidId))
                 .thenReturn(Optional.empty());
@@ -172,4 +172,39 @@ public class ClientServiceImplTest {
 
         assertEquals(mockClientList, returnedClients);
     }
+
+    @Test
+    void updateShouldBeSuccessful_WhenClientExists() {
+        // Set up
+        when(clientRepository.findById(eq(MOCK_ID_1)))
+                .thenReturn(Optional.ofNullable(mockClient1));
+
+        String updatedFullName = "João da Silva";
+
+        Client updatedClient = mockClient1.toBuilder().build(); //Shallow copy
+        updatedClient.setFullName(updatedFullName);
+
+        ClientForm updatedClientForm = mockClientForm1.toBuilder().build(); //Shallow copy
+        updatedClientForm.setFullName(updatedFullName);
+
+        when(clientRepository.save(any(Client.class)))
+                .thenReturn(mockClient1, updatedClient);
+
+        // Call
+        clientService.save(mockClientForm1);
+        Client returnedClient = clientService.update(updatedClientForm);
+
+        // Assert
+        assertEquals(updatedClient, returnedClient);
+    }
+
+    @Test
+    void updateShouldThrowException_WhenClientDoesNotExist() {
+        // Set up
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> clientService.update(mockClientForm1));
+    }
+
 }

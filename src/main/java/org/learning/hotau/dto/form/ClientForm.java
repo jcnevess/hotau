@@ -1,8 +1,6 @@
 package org.learning.hotau.dto.form;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.validator.constraints.br.CPF;
 
 import javax.validation.constraints.Email;
@@ -11,9 +9,13 @@ import javax.validation.constraints.Past;
 import java.time.LocalDate;
 
 @Data
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientForm {
+
+    private Long id;
+
     @Email
     private String email;
 
