@@ -36,4 +36,10 @@ public class ClientController {
     public ResponseEntity<Client> get(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.findById(id));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Client> update(@PathVariable Long id, @Valid @RequestBody ClientForm form) {
+            clientService.update(id, form);
+            return ResponseEntity.noContent().build();
+    }
 }

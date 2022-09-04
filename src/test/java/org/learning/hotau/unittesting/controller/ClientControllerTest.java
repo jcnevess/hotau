@@ -21,8 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -188,8 +187,25 @@ public class ClientControllerTest {
     }
 
     @Test
-    void shouldUpdateClient_WhenItExists() {
+    void updateShouldBeSuccessful_WhenClientExists() throws Exception {
+        when(clientService.update(anyLong(), any(ClientForm.class)))
+                .thenReturn(mockClient1);
 
+        mockMvc.perform(put(REQUEST_ROOT_URL + "/" + MOCK_ID_1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(mockClientForm1)))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void updateShouldReturnNotFound_WhenClientDoesNotExist() throws Exception {
+        when(clientService.update(anyLong(), any(ClientForm.class)))
+                .thenThrow(NoSuchElementException.class);
+
+        mockMvc.perform(put(REQUEST_ROOT_URL + "/" + MOCK_ID_1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(mockClientForm1)))
+                .andExpect(status().isNotFound());
     }
 
 }

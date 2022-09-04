@@ -13,9 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientForm {
-
-    private Long id;
-
     @Email
     private String email;
 

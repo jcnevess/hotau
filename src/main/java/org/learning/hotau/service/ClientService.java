@@ -10,6 +10,6 @@ public interface ClientService {
     Client save(ClientForm form);
     Client findById(Long id);
     List<Client> findAll();
-    Client update(ClientForm form);
+    Client update(Long id, ClientForm form);
     void delete(Long id);
 }

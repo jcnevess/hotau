@@ -52,8 +52,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client update(ClientForm form) {
-        return clientRepository.findById(form.getId())
+    public Client update(Long id, ClientForm form) {
+        return clientRepository.findById(id)
                 .map(client -> {
                     client.setEmail(form.getEmail());
                     client.setFullName(form.getFullName());

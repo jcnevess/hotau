@@ -56,7 +56,6 @@ public class ClientServiceImplTest {
 
     private void setUpMockClientForm() {
         mockClientForm1 = new ClientForm();
-        mockClientForm1.setId(MOCK_ID_1);
         mockClientForm1.setEmail(MOCK_EMAIL_1);
         mockClientForm1.setFullName(MOCK_FULL_NAME_1);
         mockClientForm1.setAddressStreet(MOCK_ADDRESS_STREET_1);
@@ -192,7 +191,7 @@ public class ClientServiceImplTest {
 
         // Call
         clientService.save(mockClientForm1);
-        Client returnedClient = clientService.update(updatedClientForm);
+        Client returnedClient = clientService.update(MOCK_ID_1, updatedClientForm);
 
         // Assert
         assertEquals(updatedClient, returnedClient);
@@ -204,7 +203,9 @@ public class ClientServiceImplTest {
         when(clientRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> clientService.update(mockClientForm1));
+        Long nonExistingId = -1L;
+
+        assertThrows(NoSuchElementException.class, () -> clientService.update(nonExistingId, mockClientForm1));
     }
 
 }
