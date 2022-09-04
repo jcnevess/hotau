@@ -186,7 +186,6 @@ public class ClientControllerTest {
                 .andExpect(jsonPath("$[0].id").value(MOCK_ID_1));
     }
 
-    // TODO HATEOS response should be 200 and not 204
     @Test
     void updateShouldBeSuccessful_WhenClientExists() throws Exception {
         when(clientService.update(anyLong(), any(ClientForm.class)))
@@ -195,7 +194,7 @@ public class ClientControllerTest {
         mockMvc.perform(put(REQUEST_ROOT_URL + "/" + MOCK_ID_1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(mockClientForm1)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test

@@ -40,7 +40,7 @@ public class ClientController {
     @PutMapping("/{id}")
     public ResponseEntity<Client> update(@PathVariable Long id, @Valid @RequestBody ClientForm form) {
         clientService.update(id, form);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
