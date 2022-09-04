@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -186,6 +186,7 @@ public class ClientControllerTest {
                 .andExpect(jsonPath("$[0].id").value(MOCK_ID_1));
     }
 
+    // TODO HATEOS response should be 200 and not 204
     @Test
     void updateShouldBeSuccessful_WhenClientExists() throws Exception {
         when(clientService.update(anyLong(), any(ClientForm.class)))
@@ -205,6 +206,22 @@ public class ClientControllerTest {
         mockMvc.perform(put(REQUEST_ROOT_URL + "/" + MOCK_ID_1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(mockClientForm1)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteShouldBeSuccessful_WhenClientExists() throws Exception {
+        mockMvc.perform(delete(REQUEST_ROOT_URL + "/" + MOCK_ID_1))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteShouldReturnNotFound_WhenClientDoesNotExist() throws Exception {
+        doThrow(NoSuchElementException.class)
+                .when(clientService).deleteById(anyLong());
+
+        Long invalidId = -1L;
+        mockMvc.perform(delete(REQUEST_ROOT_URL + "/" + invalidId))
                 .andExpect(status().isNotFound());
     }
 

@@ -18,7 +18,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class ClientServiceImplTest {
@@ -208,4 +208,23 @@ public class ClientServiceImplTest {
         assertThrows(NoSuchElementException.class, () -> clientService.update(nonExistingId, mockClientForm1));
     }
 
+    @Test
+    void deleteShouldBeSuccessful_WhenClientExists() {
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+
+        when(clientRepository.existsById(anyLong()))
+                .thenReturn(true);
+
+        assertDoesNotThrow(() -> clientService.deleteById(MOCK_ID_1));
+        assertThrows(NoSuchElementException.class, () -> clientService.findById(MOCK_ID_1));
+    }
+
+    @Test
+    void deleteShouldThrowException_WhenClientDoesNotExist() {
+        when(clientRepository.existsById(anyLong()))
+                .thenReturn(false);
+
+        assertThrows(NoSuchElementException.class, () -> clientService.deleteById(MOCK_ID_1));
+    }
 }

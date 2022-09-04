@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -79,6 +80,12 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void deleteById(Long id) {
+        if(clientRepository.existsById(id)) {
+            clientRepository.deleteById(id);
+        } else {
+            throw new NoSuchElementException();
+        }
+
     }
 }
