@@ -10,6 +10,7 @@ import org.learning.hotau.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -226,5 +227,44 @@ public class ClientServiceImplTest {
                 .thenReturn(false);
 
         assertThrows(NoSuchElementException.class, () -> clientService.deleteById(MOCK_ID_1));
+    }
+
+    @Test
+    void createShouldBeSuccessful_WhenCpfCodeIsUnique() {
+        String newCpfCode = "14348725055"; // Random generated
+
+        Client mockClient2 = mockClient1.toBuilder().build();
+        mockClient2.setCpfCode(newCpfCode);
+
+        ClientForm mockClientForm2 = mockClientForm1.toBuilder().build();
+        mockClientForm2.setCpfCode(newCpfCode);
+
+        when(clientRepository.save(any(Client.class)))
+                .thenReturn(mockClient1)
+                .thenReturn(mockClient2);
+
+        assertDoesNotThrow(() -> clientService.save(mockClientForm1));
+        assertDoesNotThrow(() -> clientService.save(mockClientForm2));
+    }
+
+    @Test
+    void createShouldThrowException_WhenCpfCodeIsNotUnique() {
+        when(clientRepository.save(any(Client.class)))
+                .thenReturn(mockClient1)
+                .thenThrow(DuplicateKeyException.class);
+
+        assertDoesNotThrow(() -> clientService.save(mockClientForm1));
+        assertThrows(DuplicateKeyException.class, () -> clientService.save(mockClientForm1));
+    }
+
+    @Test
+    void updateShouldThrowException_WhenCpfCodeIsUpdatedToExistingValue() {
+        when(clientRepository.findById(MOCK_ID_1))
+                .thenReturn(Optional.ofNullable(mockClient1));
+
+        when(clientRepository.save(any(Client.class)))
+                .thenThrow(DuplicateKeyException.class);
+
+        assertThrows(DuplicateKeyException.class, () -> clientService.update(MOCK_ID_1, mockClientForm1));
     }
 }

@@ -30,7 +30,7 @@ public class Client {
 
     private String secondaryPhoneNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String cpfCode;
 
     private String nationalIdCode;

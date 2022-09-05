@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -219,9 +220,70 @@ public class ClientControllerTest {
         doThrow(NoSuchElementException.class)
                 .when(clientService).deleteById(anyLong());
 
-        Long invalidId = -1L;
+        long invalidId = -1L;
         mockMvc.perform(delete(REQUEST_ROOT_URL + "/" + invalidId))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void createShouldBeSuccessful_WhenCpfCodeIsUnique() throws Exception {
+        String newCpfCode = "14348725055"; // Random generated
+
+        Client mockClient2 = mockClient1.toBuilder().build();
+        mockClient2.setCpfCode(newCpfCode);
+
+        ClientForm mockClientForm2 = mockClientForm1.toBuilder().build();
+        mockClientForm2.setCpfCode(newCpfCode);
+
+        when(clientService.save(any(ClientForm.class)))
+                .thenReturn(mockClient1)
+                .thenReturn(mockClient2);
+
+        mockMvc.perform(post(REQUEST_ROOT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(mockClientForm1)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.cpfCode").value(MOCK_CPF_CODE_1));
+
+        mockMvc.perform(post(REQUEST_ROOT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(mockClientForm2)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.cpfCode").value(newCpfCode));
+    }
+
+    @Test
+    void createShouldReturnError_WhenCpfCodeIsNotUnique() throws Exception {
+        when(clientService.save(any(ClientForm.class)))
+                .thenReturn(mockClient1)
+                .thenThrow(DuplicateKeyException.class);
+
+        mockMvc.perform(post(REQUEST_ROOT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(mockClientForm1)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.cpfCode").value(MOCK_CPF_CODE_1));
+
+        mockMvc.perform(post(REQUEST_ROOT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(mockClientForm1)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
+    @Test
+    void updateShouldReturnError_WhenCpfCodeIsUpdatedToExistingValue() throws Exception {
+        when(clientService.update(anyLong(), any(ClientForm.class)))
+                .thenThrow(DuplicateKeyException.class);
+
+        mockMvc.perform(put(REQUEST_ROOT_URL + "/" + MOCK_ID_1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(mockClientForm1)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
 
 }
