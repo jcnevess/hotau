@@ -88,4 +88,9 @@ public class ClientServiceImpl implements ClientService {
         }
 
     }
+
+    @Override
+    public List<Client> filterByCpfCode(String cpfCode) {
+        return clientRepository.findAllByCpfCode(cpfCode);
+    }
 }

@@ -267,4 +267,22 @@ public class ClientServiceImplTest {
 
         assertThrows(DuplicateKeyException.class, () -> clientService.update(MOCK_ID_1, mockClientForm1));
     }
+
+    @Test
+    void filterByCpfCodeShouldReturnOneClient_WhenItIsRegistered() {
+        when(clientRepository.findAllByCpfCode(anyString()))
+                .thenReturn(Collections.singletonList(mockClient1));
+
+        List<Client> returnedClients = clientService.filterByCpfCode(MOCK_CPF_CODE_1);
+        assertFalse(returnedClients.isEmpty());
+        assertEquals(mockClient1, returnedClients.get(0));
+    }
+
+    @Test
+    void filterByCpfCodeShouldEmptyArray_WhenItIsNotRegistered() {
+        when(clientRepository.findAllByCpfCode(anyString()))
+                .thenReturn(new ArrayList<>());
+
+        assertTrue(clientService.filterByCpfCode(MOCK_CPF_CODE_1).isEmpty());
+    }
 }

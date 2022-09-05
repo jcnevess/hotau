@@ -4,7 +4,10 @@ import org.learning.hotau.model.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    // TODO Add search by CpfCode
+    List<Client> findAllByCpfCode(String cpfCode);
 }

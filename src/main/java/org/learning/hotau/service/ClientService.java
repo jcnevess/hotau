@@ -11,4 +11,5 @@ public interface ClientService {
     List<Client> findAll();
     Client update(Long id, ClientForm form);
     void deleteById(Long id);
+    List<Client> filterByCpfCode(String CpfCode);
 }

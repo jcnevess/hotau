@@ -285,5 +285,31 @@ public class ClientControllerTest {
                 .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
+    @Test
+    void filterByCpfCodeShouldReturnOneClient_WhenItsRegistered() throws Exception {
+        when(clientService.filterByCpfCode(anyString()))
+                .thenReturn(Collections.singletonList(mockClient1));
+
+        mockMvc.perform(get(REQUEST_ROOT_URL)
+                        .param("cpfCode", MOCK_CPF_CODE_1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0]").exists())
+                .andExpect(jsonPath("$[0].id").value(MOCK_ID_1))
+                .andExpect(jsonPath("$[1]").doesNotExist());
+    }
+
+    @Test
+    void filterByCpfCodeShouldReturnEmptyArray_WhenItsNotRegistered() throws Exception {
+        when(clientService.filterByCpfCode(anyString()))
+                .thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get(REQUEST_ROOT_URL)
+                        .param("cpfCode", MOCK_CPF_CODE_1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
 
 }

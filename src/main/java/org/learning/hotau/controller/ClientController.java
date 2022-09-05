@@ -48,4 +48,9 @@ public class ClientController {
         clientService.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping(params = "cpfCode")
+    public ResponseEntity<Iterable<Client>> getByCpf(@RequestParam String cpfCode) {
+        return ResponseEntity.ok(clientService.filterByCpfCode(cpfCode));
+    }
 }
