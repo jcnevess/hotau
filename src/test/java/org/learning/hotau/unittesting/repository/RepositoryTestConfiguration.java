@@ -1,4 +1,4 @@
-package org.learning.hotau.unittesting;
+package org.learning.hotau.unittesting.repository;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
