@@ -212,19 +212,15 @@ public class ClientServiceImplTest {
     @Test
     void deleteShouldBeSuccessful_WhenClientExists() {
         when(clientRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
-
-        when(clientRepository.existsById(anyLong()))
-                .thenReturn(true);
+                .thenReturn(Optional.ofNullable(mockClient1));
 
         assertDoesNotThrow(() -> clientService.deleteById(MOCK_ID_1));
-        assertThrows(NoSuchElementException.class, () -> clientService.findById(MOCK_ID_1));
     }
 
     @Test
     void deleteShouldThrowException_WhenClientDoesNotExist() {
-        when(clientRepository.existsById(anyLong()))
-                .thenReturn(false);
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> clientService.deleteById(MOCK_ID_1));
     }

@@ -79,15 +79,12 @@ public class ClientServiceImpl implements ClientService {
                 .orElseThrow();
     }
 
-    // TODO All delete should use the faster findById instead of existsById
     @Override
     public void deleteById(Long id) {
-        if(clientRepository.existsById(id)) {
-            clientRepository.deleteById(id);
-        } else {
-            throw new NoSuchElementException();
-        }
-
+        clientRepository.findById(id).ifPresentOrElse(
+                client -> clientRepository.deleteById(id),
+                () -> { throw new NoSuchElementException(); }
+        );
     }
 
     @Override
