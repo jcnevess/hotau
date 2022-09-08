@@ -36,6 +36,7 @@ public class PetControllerTest {
     private static final String PET_BREED_MOCK = "Pit Bull";
     private static final String PET_SEX_MOCK = "Male";
     private static final int PET_AGE_MOCK = 7;
+    private static final long PET_OWNER_ID_MOCK = 1L;
     private static final String BASE_URL = "/pets";
 
     @Autowired
@@ -69,6 +70,7 @@ public class PetControllerTest {
                 .isNeutered(PET_NEUTERED_MOCK)
                 .breed(PET_BREED_MOCK)
                 .sex(PET_SEX_MOCK)
+                .ownerId(PET_OWNER_ID_MOCK)
                 .build();
     }
 
@@ -191,5 +193,30 @@ public class PetControllerTest {
         long invalidId = -1L;
         mockMvc.perform(delete(URI.create(BASE_URL + "/" + invalidId)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void filterByOwnerIdShouldReturnPets_WhenClientExists() throws Exception {
+        when(petService.filterByOwnerId(anyLong()))
+                .thenReturn(Collections.singletonList(mockPet));
+
+        mockMvc.perform(get(BASE_URL)
+                .param("ownerId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$[0].id").value(PET_ID_MOCK));
+    }
+
+    @Test
+    void filterByOwnerIdShouldReturnEmptyList_WhenClientDoesNotExist() throws Exception {
+        when(petService.filterByOwnerId(anyLong()))
+                .thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get(BASE_URL)
+                        .param("ownerId", "-1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isEmpty());
     }
 }

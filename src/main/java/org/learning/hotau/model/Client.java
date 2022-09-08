@@ -39,8 +39,8 @@ public class Client {
 
     private LocalDateTime clientSince = LocalDateTime.now();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "client_id")
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
 }

@@ -1,17 +1,15 @@
 package org.learning.hotau.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
-@Table(name = "Addresses")
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
+@Entity @Table(name = "Addresses")
 public class Address {
 
     @Id

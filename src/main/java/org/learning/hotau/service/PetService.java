@@ -1,6 +1,7 @@
 package org.learning.hotau.service;
 
 import org.learning.hotau.dto.form.PetForm;
+import org.learning.hotau.exception.InvalidReferenceException;
 import org.learning.hotau.model.Pet;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public interface PetService {
     List<Pet> findAll();
 
     Pet update(Long id, PetForm form);
+
+    List<Pet> filterByOwnerId(Long ownerId);
 
     void deleteById(Long id);
 

@@ -1,4 +1,4 @@
-package org.learning.hotau.exception;
+package org.learning.hotau.exception.handler;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;

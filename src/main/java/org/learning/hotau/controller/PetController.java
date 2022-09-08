@@ -51,4 +51,9 @@ public class PetController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping(params = "ownerId")
+    public ResponseEntity<Iterable<Pet>> filterByOwnerId(@RequestParam Long ownerId) {
+        return ResponseEntity.ok(petService.filterByOwnerId(ownerId));
+    }
+
 }

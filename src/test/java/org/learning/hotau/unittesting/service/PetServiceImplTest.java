@@ -3,7 +3,11 @@ package org.learning.hotau.unittesting.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.learning.hotau.dto.form.PetForm;
+import org.learning.hotau.exception.InvalidReferenceException;
+import org.learning.hotau.model.Address;
+import org.learning.hotau.model.Client;
 import org.learning.hotau.model.Pet;
+import org.learning.hotau.repository.ClientRepository;
 import org.learning.hotau.repository.PetRepository;
 import org.learning.hotau.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
 
@@ -29,14 +34,20 @@ public class PetServiceImplTest {
     private static final String PET_BREED_MOCK = "Pit Bull";
     private static final String PET_SEX_MOCK = "Male";
     private static final int PET_AGE_MOCK = 7;
+    private static final long PET_OWNER_ID_MOCK = 1L;
+
     @MockBean
     private PetRepository petRepository;
+
+    @MockBean
+    private ClientRepository clientRepository;
 
     @Autowired
     private PetService petService;
 
     private Pet mockPet;
     private PetForm mockPetForm;
+    private Client mockClient;
 
     @BeforeEach
     void setUp() {
@@ -48,6 +59,7 @@ public class PetServiceImplTest {
                 .isNeutered(PET_NEUTERED_MOCK)
                 .breed(PET_BREED_MOCK)
                 .sex(PET_SEX_MOCK)
+                .owner(mockClient)
                 .build();
 
         mockPetForm = PetForm.builder()
@@ -57,6 +69,27 @@ public class PetServiceImplTest {
                 .isNeutered(PET_NEUTERED_MOCK)
                 .breed(PET_BREED_MOCK)
                 .sex(PET_SEX_MOCK)
+                .ownerId(PET_OWNER_ID_MOCK)
+                .build();
+
+        mockClient = Client.builder()
+                .email("jose@mail.com")
+                .fullName("José")
+                .address(Address.builder()
+                                .street("Rua Projetada")
+                                .streetNumber("S/N")
+                                .neighborhood("New City")
+                                .zipcode("55555-55")
+                                .city("Townpolis")
+                                .state("New River")
+                                .country("Ocean")
+                                .build())
+                .mainPhoneNumber("+5555999888777")
+                .secondaryPhoneNumber("+5555666555444")
+                .cpfCode("987654321-00")
+                .nationalIdCode("1234678")
+                .birthday(LocalDate.now())
+                .clientSince(LocalDateTime.now())
                 .build();
     }
 
@@ -65,9 +98,20 @@ public class PetServiceImplTest {
         when(petRepository.save(any(Pet.class)))
                 .thenReturn(mockPet);
 
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(mockClient));
+
         Pet savedPet = petService.save(mockPetForm);
 
         assertEquals(mockPet, savedPet);
+    }
+
+    @Test
+    void saveShouldFail_WhenOwnerIdIsInvalid() {
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(InvalidReferenceException.class, () -> petService.save(mockPetForm));
     }
 
     @Test
@@ -122,6 +166,9 @@ public class PetServiceImplTest {
         PetForm updatedMockPetForm = mockPetForm.toBuilder().build(); //Shallow copy
         updatedMockPetForm.setBreed(updatedBreed);
 
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(mockClient));
+
         when(petRepository.findById(anyLong()))
                 .thenReturn(Optional.ofNullable(mockPet));
 
@@ -135,16 +182,32 @@ public class PetServiceImplTest {
     }
 
     @Test
-    void updateShouldReturnError_WhenPetDoesNotExist() {
+    void updateShouldThrowException_WhenPetDoesNotExist() {
         String updatedBreed = "Pinscher";
 
         PetForm updatedMockPetForm = mockPetForm.toBuilder().build(); //Shallow copy
         updatedMockPetForm.setBreed(updatedBreed);
 
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(mockClient));
+
         when(petRepository.findById(anyLong()))
                 .thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> petService.update(PET_ID_MOCK, updatedMockPetForm));
+    }
+
+    @Test
+    void updateShouldThrowException_WhenOwnerIsNotFound() {
+        String updatedBreed = "Pinscher";
+
+        PetForm updatedMockPetForm = mockPetForm.toBuilder().build(); //Shallow copy
+        updatedMockPetForm.setBreed(updatedBreed);
+
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(InvalidReferenceException.class, () -> petService.update(PET_ID_MOCK, updatedMockPetForm));
     }
 
     @Test
@@ -157,9 +220,36 @@ public class PetServiceImplTest {
 
     @Test
     void deleteShouldThrowException_WhenPetDoesNotExist() {
-        when(petRepository.existsById(anyLong()))
-                .thenReturn(false);
+        when(petRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class, () -> petService.deleteById(PET_ID_MOCK));
+    }
+
+    @Test
+    void filterByOwnerShouldReturnPets_WhenOwnerExists() {
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.ofNullable(mockClient));
+
+        when(petRepository.findAllByOwnerId(anyLong()))
+                .thenReturn(Collections.singletonList(mockPet));
+
+        List<Pet> foundPets = petService.filterByOwnerId(PET_OWNER_ID_MOCK);
+
+        assertNotNull(foundPets);
+        assertFalse(foundPets.isEmpty());
+        assertEquals(1, foundPets.size());
+        assertEquals(PET_ID_MOCK, foundPets.get(0).getId());
+    }
+
+    @Test
+    void filterByOwnerShouldReturnEmptyList_WhenOwnerDoesNotExist() {
+        when(clientRepository.findById(anyLong()))
+                .thenReturn(Optional.empty());
+
+        List<Pet> foundPets = petService.filterByOwnerId(PET_OWNER_ID_MOCK);
+
+        assertNotNull(foundPets);
+        assertTrue(foundPets.isEmpty());
     }
 }

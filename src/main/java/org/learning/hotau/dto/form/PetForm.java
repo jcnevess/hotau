@@ -32,4 +32,7 @@ public class PetForm {
 
     @NotBlank
     private String sex;
+
+    @NotNull
+    private Long ownerId;
 }

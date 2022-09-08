@@ -36,10 +36,12 @@ public class Pet {
     private String sex;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "pet_note", joinColumns = @JoinColumn(name = "pet_id"))
+    @CollectionTable(name = "pet_notes", joinColumns = @JoinColumn(name = "pet_id"))
     @Column(name = "note_id")
     @Builder.Default
     private List<String> notes = new ArrayList<>();
 
-
+    @ManyToOne
+    @JoinColumn(name="owner_id", nullable = false)
+    private Client owner;
 }
