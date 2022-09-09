@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 @Entity @Table(name = "Addresses")
 public class Address {
 
+    // TODO Remove validation annotations
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
