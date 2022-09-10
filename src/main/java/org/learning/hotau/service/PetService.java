@@ -1,7 +1,6 @@
 package org.learning.hotau.service;
 
 import org.learning.hotau.dto.form.PetForm;
-import org.learning.hotau.exception.InvalidReferenceException;
 import org.learning.hotau.model.Pet;
 
 import java.util.List;
