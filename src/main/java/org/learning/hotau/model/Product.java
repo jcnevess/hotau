@@ -1,5 +1,6 @@
 package org.learning.hotau.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +22,7 @@ public class Product {
     private String description;
 
     @Column(precision = 10, scale = 2)
+    @JsonSerialize(typing = JsonSerialize.Typing.STATIC, as = BigDecimal.class)
     private BigDecimal price;
 
 }
